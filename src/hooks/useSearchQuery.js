@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export function useSearchQuery() {
@@ -15,9 +15,18 @@ export function useSearchQuery() {
   );
   const [triggerSearch, setTriggerSearch] = useState(!!initialQuery);
 
+  useEffect(() => {
+    const queryFromUrl = searchParams.get("q") || "";
+    setSearchQuery(queryFromUrl);
+    setFinalQuery(queryFromUrl);
+    setIndexName(searchParams.get("index") || "qa-en");
+    setSortOption(searchParams.get("sort") || "relevance");
+    setTriggerSearch(!!queryFromUrl);
+  }, [searchParams, setSearchParams]);
+
   const updateSearchParams = () => {
     const params = new URLSearchParams({
-      q: finalQuery,
+      q: searchQuery, // Use searchQuery to ensure latest input
       index: indexName,
       sort: sortOption,
       page: searchParams.get("page") || "1",
@@ -27,7 +36,7 @@ export function useSearchQuery() {
         params.set(key, searchParams.get(key));
       }
     });
-    setSearchParams(params, { replace: true }); // Replace instead of push
+    setSearchParams(params, { replace: true });
   };
 
   const handleSearch = (e) => {

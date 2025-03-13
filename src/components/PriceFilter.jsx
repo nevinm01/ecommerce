@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
 
-const PriceFilter = ({ onPriceChange, products }) => {
-  const min = 5.0; // KWD 5.000
-  const max = 1490.0; // KWD 1,490.000
+const PriceFilter = ({ onPriceChange }) => {
+  const min = 5.0;
+  const max = 1490.0;
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Initialize price range from URL params or defaults
-  const initialMinPrice = parseFloat(searchParams.get("minPrice")) || min;
-  const [priceRange, setPriceRange] = useState([initialMinPrice, max]);
+  // Derive price range directly from searchParams
+  const priceRange = [
+    parseFloat(searchParams.get("minPrice")) || min,
+    parseFloat(searchParams.get("maxPrice")) || max,
+  ];
 
   const handlePriceChange = (e) => {
     const value = Number(e.target.value);
     const newRange = [value, max];
-    setPriceRange(newRange);
 
     // Update URL parameters
     const newParams = new URLSearchParams(searchParams);

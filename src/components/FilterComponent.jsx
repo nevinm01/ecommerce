@@ -43,7 +43,7 @@ const FilterComponent = ({ onFilterChange, products }) => {
         newParams.delete(key);
       }
     });
-    setSearchParams(newParams, { replace: true }); // Replace instead of push
+    setSearchParams(newParams, { replace: true });
 
     onFilterChange(newFilters);
   };
@@ -57,8 +57,11 @@ const FilterComponent = ({ onFilterChange, products }) => {
     setFilters(clearedFilters);
 
     const newParams = new URLSearchParams(searchParams);
-    ["category", "brand", "color"].forEach((key) => newParams.delete(key));
-    setSearchParams(newParams, { replace: true }); // Replace instead of push
+    // Clear all filter-related parameters, including price
+    ["category", "brand", "color", "minPrice", "maxPrice"].forEach((key) =>
+      newParams.delete(key)
+    );
+    setSearchParams(newParams, { replace: true });
 
     onFilterChange(clearedFilters);
   };

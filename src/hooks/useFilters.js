@@ -1,39 +1,19 @@
-import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export function useFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const initialFilters = {
-    category: searchParams.get("category")?.split(",") || [],
-    brand: searchParams.get("brand")?.split(",") || [],
-    color: searchParams.get("color")?.split(",") || [],
+  const activeFilters = {
+    category: searchParams.get("category")?.split(",").filter(Boolean) || [],
+    brand: searchParams.get("brand")?.split(",").filter(Boolean) || [],
+    color: searchParams.get("color")?.split(",").filter(Boolean) || [],
   };
-  const initialMinPrice = parseFloat(searchParams.get("minPrice")) || 5.0;
-  const initialMaxPrice = parseFloat(searchParams.get("maxPrice")) || 1490.0;
-
-  const [activeFilters, setActiveFilters] = useState(initialFilters);
-  const [priceRange, setPriceRange] = useState([
-    initialMinPrice,
-    initialMaxPrice,
-  ]);
-
-  useEffect(() => {
-    const newFilters = {
-      category: searchParams.get("category")?.split(",") || [],
-      brand: searchParams.get("brand")?.split(",") || [],
-      color: searchParams.get("color")?.split(",") || [],
-    };
-    setActiveFilters(newFilters);
-
-    const minPrice = parseFloat(searchParams.get("minPrice")) || 5.0;
-    const maxPrice = parseFloat(searchParams.get("maxPrice")) || 1490.0;
-    setPriceRange([minPrice, maxPrice]);
-  }, [searchParams]);
+  const minPrice = parseFloat(searchParams.get("minPrice")) || 5.0;
+  const maxPrice = parseFloat(searchParams.get("maxPrice")) || 1490.0;
+  const priceRange = [minPrice, maxPrice];
 
   const filterAndSortProducts = (products, sortOption) => {
-    const minPrice = priceRange[0];
-    const maxPrice = priceRange[1];
+    const [minPrice, maxPrice] = priceRange;
 
     let filtered = products.filter((product) => {
       const price = Number(product.price) || Number(product.cost) || 0;
@@ -71,15 +51,13 @@ export function useFilters() {
   };
 
   const updatePriceRange = (newRange) => {
-    setPriceRange(newRange);
     const newParams = new URLSearchParams(searchParams);
     newParams.set("minPrice", newRange[0].toString());
     newParams.set("maxPrice", newRange[1].toString());
-    setSearchParams(newParams, { replace: true }); // Replace instead of push
+    setSearchParams(newParams, { replace: true });
   };
 
   const updateFilters = (newFilters) => {
-    setActiveFilters(newFilters);
     const newParams = new URLSearchParams(searchParams);
     Object.entries(newFilters).forEach(([key, values]) => {
       if (values.length > 0) {
@@ -88,7 +66,7 @@ export function useFilters() {
         newParams.delete(key);
       }
     });
-    setSearchParams(newParams, { replace: true }); // Replace instead of push
+    setSearchParams(newParams, { replace: true });
   };
 
   return {
